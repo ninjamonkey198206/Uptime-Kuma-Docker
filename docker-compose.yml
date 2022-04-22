@@ -1,0 +1,33 @@
+version: "3.7"
+
+# Networks
+networks:
+  uptimekuma:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: uptimekuma
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}/24
+          gateway: ${GATEWAY}
+
+# Docker managed persistent volumes
+volumes:
+  uptime-kuma:
+
+services:
+  # Uptime-Kuma
+  uptime-kuma:
+    container_name: uptime-kuma
+    image: louislam/uptime-kuma:latest
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    networks:
+      uptimekuma:
+        ipv4_address: ${UPTIME_IP}
+    ports:
+      - ${UPTIME_EXP_PORT}:3001
+    volumes:
+      - uptime-kuma:/app/data
